@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Hello World!
-tagline: Supporting tagline
+title: While true ...
+tagline: bits all the way
 ---
 {% include JB/setup %}
 
