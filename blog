@@ -39,12 +39,12 @@ publish(){
 cmsg "publish: Publishing $1"
 [ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
 mv $1 $PUBLISHDIR
-# insert post in index.html
+# insert post into index.html
 fn=`basename $1`
-day=`echo $f| cut -d "-" -f 3`
-month=$( date -j -f "%m" $(echo $f| cut -d "-" -f 2) +"%b" )
-year=`echo $f| cut -d "-" -f 1| sed 's@.*/@@g'`
-tit=`echo $f| cut -d "-" -f 4-| sed 's@.md@@g'`
+day=`echo $fn| cut -d "-" -f 3`
+month=$( date -j -f "%m" $(echo $fn| cut -d "-" -f 2) +"%b" )
+year=`echo $fn| cut -d "-" -f 1| sed 's@.*/@@g'`
+tit=`echo $fn| cut -d "-" -f 4-| sed 's@.md@@g'`
 cmsg "publish: Backing up index.html..."
 cp -a index.html .blog.index.thml.bkp
 if [ -s .blog.index.thml.bkp ] ; then
@@ -54,6 +54,8 @@ else
  cmsg "publish: WARNING: couldn't generate backup .blog.index.thml.bkp: Failed to insert post entry into index.html"
 fi
 [ $? -eq 0 ] || errmsg "publish: Something went wrong when updating index.html"
+[ -L $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
+ln -s $fn $PUBLISHDIR/latest.html
 }
 
 render(){
