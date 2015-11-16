@@ -55,7 +55,7 @@ else
 fi
 [ $? -eq 0 ] || errmsg "publish: Something went wrong when updating index.html"
 [ -L $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
-ln -s $fn $PUBLISHDIR/latest.html
+ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
 }
 
 render(){
