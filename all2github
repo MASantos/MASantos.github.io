@@ -1,0 +1,6 @@
+#!/bin/bash
+git add .
+git commit -a 
+[ $? -eq 0 ] && git push origin master $$ exit
+echo "Something went wrong?"
+
