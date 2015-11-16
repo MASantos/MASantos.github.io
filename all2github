@@ -1,6 +1,12 @@
 #!/bin/bash
 git add .
 git commit -a 
-[ $? -eq 0 ] && git push origin master $$ exit
-echo "Something went wrong?"
+[ $? -eq 0 ] || { echo "ERROR while commmitting" ; exit 1 ;}
+echo "Proceed push to github rep [Y/n]?"
+read uinp 
+case $uinp in
+	n*|N*) echo "Skipping push to origin" ; exit ;;
+	*) git push origin master ;;
+esac
+echo "Done"
 
