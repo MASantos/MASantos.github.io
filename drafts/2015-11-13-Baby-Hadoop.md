@@ -17,22 +17,20 @@ bash scripts as hadoop standalone and streaming runs.
 Installing & running Hadoop in OSX 10.6.8
 
 1. Downloaded hadoop 2.7.1 binary. I have JAVA 1.6.0_65. when running the basic first test I get error :
-```
-$bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar grep input test/output 'dfs[a-z.]+'
-Exception in thread "main" java.lang.UnsupportedClassVersionError: org/apache/hadoop/util/RunJar : Unsupported major.minor version 51.0
-        at java.lang.ClassLoader.defineClass1(Native Method)
-        at java.lang.ClassLoader.defineClassCond(ClassLoader.java:637)
-        at java.lang.ClassLoader.defineClass(ClassLoader.java:621)
-        at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:141)
-        at java.net.URLClassLoader.defineClass(URLClassLoader.java:283)
-        at java.net.URLClassLoader.access$000(URLClassLoader.java:58)
-        at java.net.URLClassLoader$1.run(URLClassLoader.java:197)
-        at java.security.AccessController.doPrivileged(Native Method)
-        at java.net.URLClassLoader.findClass(URLClassLoader.java:190)
-        at java.lang.ClassLoader.loadClass(ClassLoader.java:306)
-        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:301)
-        at java.lang.ClassLoader.loadClass(ClassLoader.java:247)
-```
+>$bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar grep input test/output 'dfs[a-z.]+'
+>Exception in thread "main" java.lang.UnsupportedClassVersionError: org/apache/hadoop/util/RunJar : Unsupported major.minor version 51.0
+>        at java.lang.ClassLoader.defineClass1(Native Method)
+>        at java.lang.ClassLoader.defineClassCond(ClassLoader.java:637)
+>        at java.lang.ClassLoader.defineClass(ClassLoader.java:621)
+>        at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:141)
+>        at java.net.URLClassLoader.defineClass(URLClassLoader.java:283)
+>        at java.net.URLClassLoader.access$000(URLClassLoader.java:58)
+>        at java.net.URLClassLoader$1.run(URLClassLoader.java:197)
+>        at java.security.AccessController.doPrivileged(Native Method)
+>        at java.net.URLClassLoader.findClass(URLClassLoader.java:190)
+>        at java.lang.ClassLoader.loadClass(ClassLoader.java:306)
+>        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:301)
+>        at java.lang.ClassLoader.loadClass(ClassLoader.java:247)
  Latest (as of Thu Nov. 12 2015) JDK jdk-8u65-nb-8_1-macosx-x64.dmg requires OSX 8 or higher. 
  I downloaded  JDK 7_u80, but it requires OS X 10.7.3 or higher
 
@@ -72,8 +70,9 @@ $sort -n hcn-max | head
 1877
 1877
 1877 289 USW00013724187709TMAX  289
-
-etting now the max per year for all stations: ./max_temp_hcn-all.sh
+```
+Getting now the max per year for all stations: ./max_temp_hcn-all.sh
+```bash
 #!/bin/bash
 
 cat input/data/NCDC/ghcnd_hcn/*.dly|  awk /TMAX/'{ year=substr($0,12,4); temp=substr($0,22,5)+0;
@@ -112,6 +111,9 @@ public class HelloWorld {
 $java -classpath . HelloWorld.java
 $hadoop HelloWorld . out
 Hello World!
+```
+So let's compile MaxTemperature and proceed:
+```
 msantos@MBP-2[19:49]:~/System/HADOOP/current/test/classes$javac -classpath `hadoop classpath` MaxTemperature.java
 Note: MaxTemperature.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
@@ -237,7 +239,9 @@ Caused by: java.io.IOException: Type mismatch in value from map: expected org.ap
 	at org.apache.hadoop.mapreduce.task.TaskInputOutputContextImpl.write(TaskInputOutputContextImpl.java:89)
 	at org.apache.hadoop.mapreduce.lib.map.WrappedMapper$Context.write(WrappedMapper.java:112)
 	at MaxTemperatureMapper.map(MaxTemperatureMapper.java:33)
-nce corrected, compiled and run we get:
+```
+Once corrected, compiled and run we get:
+```
 msantos@MBP-2[12:21]:~/System/HADOOP/current/test$!hadoop
 hadoop MaxTemperature input/data/NCDC/ghcnd_hcn/USC00011084.dly output_hcn
 15/11/13 12:21:46 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable

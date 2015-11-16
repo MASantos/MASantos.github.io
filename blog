@@ -54,7 +54,7 @@ else
  cmsg "publish: WARNING: couldn't generate backup .blog.index.thml.bkp: Failed to insert post entry into index.html"
 fi
 [ $? -eq 0 ] || errmsg "publish: Something went wrong when updating index.html"
-[ -L $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
+[ -f $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
 ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
 }
 
