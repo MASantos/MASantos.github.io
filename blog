@@ -1,0 +1,80 @@
+#!/bin/bash
+########## Settings
+PUBLISH=0
+IMDFS=()
+PROMPT="blog"
+PUBLISHDIR=posts
+DRAFTSDIR=drafts
+TITLE="new post"
+########## Code
+parse(){
+while [ $# -gt 0 ] ; do
+	case $1 in
+		-p|--publish) shift ; PUBLISH=1;;
+		-e|--edit|--new) shift; TITLE="$@"; while [ $# -gt 0 ] ; do shift ;done ;
+			editPost ; exit ;;
+		*) IMDFS=( ${IMDFS[@]} "$1" ) ; shift ;;
+	esac
+done
+}
+
+editPost(){
+fn=$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g')
+[ -s $DRAFTSDIR/$fn ] || echo -e "# $TITLE\n\n" > $DRAFTSDIR/$fn
+vi + $DRAFTSDIR/$fn
+cmsg "editPost: $DRAFTSDIR/$fn"
+}
+
+blogIt(){
+for f in ${IMDFS[@]} ; do
+	OUT=""
+	[ -s $f ] || errmsg "blogIt: file not found $f"
+	render $f
+	[ $PUBLISH -eq 1 ] && publish $OUTF
+done
+}
+
+publish(){
+[ $# -ne 1 ] && errmsg "publish: Wrong number of arguments $@"
+cmsg "publish: Publishing $1"
+[ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
+mv $1 $PUBLISHDIR
+# insert post in index.html
+fn=`basename $1`
+day=`echo $f| cut -d "-" -f 3`
+month=$( date -j -f "%m" $(echo $f| cut -d "-" -f 2) +"%b" )
+year=`echo $f| cut -d "-" -f 1`
+tit=`echo $f| cut -d "-" -f 4-| sed 's@.md@@g'`
+cmsg "publish: Backing up index.html..."
+cp -a index.html .blog.index.thml.bkp
+if [ -s .blog.index.thml.bkp ] ; then
+ cat .blog.index.thml.bkp | sed 's@\(<ul class="posts">\)@\1\n <li><span>'$day' '$month' '$year'</span> \&raquo; <a href="posts/'$fn'">'$tit'</a></li>@g' > index.html
+ cmsg "publish: Inserted new post entry $tit in index.html"
+else
+ cmsg "publish: WARNING: couldn't generate backup .blog.index.thml.bkp: Failed to insert post entry into index.html"
+fi
+[ $? -eq 0 ] || errmsg "publish: Something went wrong when updating index.html"
+}
+
+render(){
+[ $# -ne 1 ] && errmsg "render : missing input file"
+OUTF=$(echo $1| sed "s@.md@.html@g")
+pandoc -f markdown -t html5 -o $OUTF $1
+[ $? -ne 0 ] && cmsg "render: WARNING: Something went wrong when rendering into html file $1 -> $OUTF"
+cmsg "render: ok... $OUTF"
+}
+
+cmsg(){
+echo "$PROMPT: $@"
+}
+errmsg(){
+cmsg "ERROR: $@"
+exit 1
+}
+
+main(){
+parse $@
+blogIt
+cmsg "Done"
+}
+main $@
