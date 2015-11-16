@@ -75,7 +75,7 @@
 				<p>This theme is still unfinished. </p>
 			</div>
   			<div class="post">
-		<post style="width:350px;float:left;padding:10px">
+		<post style="width:100%;float:left;padding:10px">
 			<iframe src="posts/latest.html" width="800" height="400" style="border:none;"></iframe>
   		</post>
 			</div>
