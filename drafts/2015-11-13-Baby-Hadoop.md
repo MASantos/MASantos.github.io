@@ -1,6 +1,6 @@
 ---
 layout: post
-category : lessons
+category : hands-on
 tagline: "First steps with Haddop"
 tags : [intro, beginner, Hadoop, OSX 10.6.8]
 ---
