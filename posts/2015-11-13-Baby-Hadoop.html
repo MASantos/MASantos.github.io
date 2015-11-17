@@ -1,10 +1,15 @@
 <h1 id="first-tests-with-hadoop-2.6.5-on-my-macbook-pro-osx-10.6.8">First tests with Hadoop 2.6.5 on my MacBook Pro OSX 10.6.8</h1>
-<h2 id="index">Index</h2>
+<h2 id="table-of-contents">Table of Contents</h2>
 <ul>
+<li>Index</li>
 <li>Overview</li>
 <li>Hadoop install &amp; config</li>
 <li>Examples</li>
+<li>data</li>
+<li>Reference: The plain bash script (no hadoop)</li>
 <li>Hadoop standalone: Java Mapper and Reducer</li>
+<li>Hadoop Streaming I : Python Mapper &amp; Reducer</li>
+<li>Hadoop Streaming II : Python single script &amp; /usr/bin/cat as trivial reducer</li>
 <li>Conclusions</li>
 </ul>
 <h2 id="overview">Overview</h2>
@@ -67,7 +72,7 @@ $sort -n hcn-max | head
 <span class="kw">real</span>    0m29.214s
 <span class="kw">user</span>    0m27.698s
 <span class="kw">sys</span> 0m3.862s</code></pre></div>
-<h2 id="hadoop-standalone-java-mapper-and-reducer">Hadoop standalone: Java Mapper and Reducer</h2>
+<h3 id="hadoop-standalone-java-mapper-and-reducer">Hadoop standalone: Java Mapper and Reducer</h3>
 <pre><code>$hadoop MaxTemperature input/data/NCDC/ghcnd_hcn/USC00011084.dly output_hcn
 Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: MaxTemperature
 Caused by: java.lang.ClassNotFoundException: MaxTemperature

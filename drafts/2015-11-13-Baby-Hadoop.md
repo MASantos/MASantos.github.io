@@ -7,11 +7,16 @@ tags : [intro, beginner, Hadoop, OSX 10.6.8]
 
 # First tests with Hadoop 2.6.5 on my MacBook Pro OSX 10.6.8
 
-## Index
+## Table of Contents
+* Index
 * Overview
 * Hadoop install & config
 * Examples
-* Hadoop standalone: Java Mapper and Reducer
+  * data
+  * Reference: The plain bash script (no hadoop)
+  * Hadoop standalone: Java Mapper and Reducer
+  * Hadoop Streaming I : Python Mapper & Reducer
+  * Hadoop Streaming II : Python single script & /usr/bin/cat as trivial reducer
 *  Conclusions
 
 ## Overview
@@ -97,7 +102,7 @@ user	0m27.698s
 sys	0m3.862s
 ```
 
-## Hadoop standalone: Java Mapper and Reducer
+### Hadoop standalone: Java Mapper and Reducer
 ```
 $hadoop MaxTemperature input/data/NCDC/ghcnd_hcn/USC00011084.dly output_hcn
 Exception in thread "main" java.lang.NoClassDefFoundError: MaxTemperature
