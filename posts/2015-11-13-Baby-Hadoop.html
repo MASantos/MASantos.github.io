@@ -6,7 +6,6 @@
 <li>Examples</li>
 <li>Hadoop standalone: Java Mapper and Reducer</li>
 <li>Conclusions</li>
-<li>Why Should I Care?</li>
 </ul>
 <h2 id="overview">Overview</h2>
 <p>Recording what happened while getting a hadoop version running and testing the first java, python and bash scripts as hadoop standalone and streaming runs.</p>
@@ -483,4 +482,3 @@ sys 0m3.815s</code></pre>
 <p>Basically, the python map/reduce and single step process both under Hadoop take the same time in processing all 1218 station files, namely around 12min.</p>
 <p>If we run the python directly from the command line on all station files it takes, however, way less: ~30s. This is more in sync with the awk script we tried at the beginning.</p>
 <p>Hadoop incurrs in an overhead that doesn't pay off undless we use many processors. We need to confirm this explicitly.</p>
-<h2 id="why-should-i-care">Why Should I Care?</h2>

@@ -13,7 +13,6 @@ tags : [intro, beginner, Hadoop, OSX 10.6.8]
 * Examples
 * Hadoop standalone: Java Mapper and Reducer
 *  Conclusions
-* Why Should I Care?
 
 ## Overview
 
@@ -570,4 +569,3 @@ This is more in sync with the awk script we tried at the beginning.
 
 Hadoop incurrs in an overhead that doesn't pay off undless we use many processors. We need to confirm this explicitly.
 
-## Why Should I Care?
