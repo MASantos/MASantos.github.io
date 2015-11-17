@@ -50,6 +50,7 @@ bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.5.2.jar grep t
 
 3. Downloaded hadoop 2.6.2 binary, installed and it worked as well -again, so far tested just the basic test above
  This is the latest version of the 2.6 branch released Oct 2015. The 2.7.1 version was released on Jul 2015.
+ This is the version used in the examples described here.
 
 ## Examples
 
