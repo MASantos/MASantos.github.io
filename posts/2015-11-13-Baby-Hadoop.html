@@ -1,5 +1,14 @@
 <h1 id="first-tests-with-hadoop-2.6.5-on-my-macbook-pro-osx-10.6.8">First tests with Hadoop 2.6.5 on my MacBook Pro OSX 10.6.8</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="index">Index</h2>
+<ul>
+<li>Overview</li>
+<li>Hadoop install &amp; config</li>
+<li>Examples</li>
+<li>Hadoop standalone: Java Mapper and Reducer</li>
+<li>Conclusions</li>
+<li>Why Should I Care?</li>
+<li>Overview</li>
+</ul>
 <p>Recording what happened while getting a hadoop version running and testing the first java, python and bash scripts as hadoop standalone and streaming runs.</p>
 <h2 id="hadoop-install-config">Hadoop install &amp; config</h2>
 <p>Installing &amp; running Hadoop in OSX 10.6.8</p>
@@ -347,6 +356,37 @@ USC00011084192612TMAX  222</code></pre>
 1943    356
 1944    350
 1945    356</code></pre>
+<p>Here the mapper and reducer are: The mapper</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+
+<span class="im">import</span> re
+<span class="im">import</span> sys
+
+<span class="cf">for</span> line <span class="op">in</span> sys.stdin:
+        val <span class="op">=</span> line.strip()
+        element <span class="op">=</span> val[<span class="dv">17</span>:<span class="dv">21</span>]
+        <span class="co">#print &quot;element:&gt;%s&lt;&quot; % element</span>
+        <span class="cf">if</span>( element <span class="op">==</span> <span class="st">&quot;TMAX&quot;</span>):
+                (year, temp, q) <span class="op">=</span> (val[<span class="dv">11</span>:<span class="dv">15</span>],val[<span class="dv">21</span>:<span class="dv">26</span>],val[<span class="dv">27</span>:<span class="dv">28</span>])
+                <span class="cf">if</span> temp <span class="op">!=</span> <span class="st">&quot;-9999&quot;</span> <span class="op">and</span>  q <span class="op">==</span> <span class="st">&quot; &quot;</span>:
+                        <span class="bu">print</span> <span class="st">&quot;</span><span class="sc">%s</span><span class="ch">\t</span><span class="sc">%s</span><span class="st">&quot;</span> <span class="op">%</span> (year,temp)</code></pre></div>
+<p>and reducer</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+
+
+<span class="im">import</span> sys
+
+(last_key,max_val) <span class="op">=</span> (<span class="va">None</span>, <span class="dv">0</span>)
+
+<span class="cf">for</span> line <span class="op">in</span> sys.stdin:
+        (key,val) <span class="op">=</span> line.strip().split(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)
+        <span class="cf">if</span> ( last_key <span class="op">and</span> last_key <span class="op">!=</span> key ):
+                <span class="bu">print</span> <span class="st">&quot;</span><span class="sc">%s</span><span class="ch">\t</span><span class="sc">%s</span><span class="st">&quot;</span> <span class="op">%</span> (last_key,max_val)
+                (last_key,max_val) <span class="op">=</span> (key,<span class="bu">int</span>(val))
+        <span class="cf">else</span>:
+                (last_key,max_val) <span class="op">=</span> (key,<span class="bu">max</span>(max_val,<span class="bu">int</span>(val)))
+<span class="cf">if</span> last_key:
+        <span class="bu">print</span> <span class="st">&quot;</span><span class="sc">%s</span><span class="ch">\t</span><span class="sc">%s</span><span class="st">&quot;</span> <span class="op">%</span> (last_key,max_val)</code></pre></div>
 <p>now Using hadoop streaming with a pythong script:</p>
 <pre><code>OUTDIR=output-py hadoop jar $HADOOP_INSTALL/share/hadoop/tools/lib/hadoop-streaming-*.jar \
         -input input/data/NCDC/ghcnd_hcn/USC00011084.dly \
@@ -384,8 +424,39 @@ real    11m44.270s
 user    8m34.876s
 sys 4m45.707s</code></pre>
 <h3 id="hadoop-streaming-ii-python-single-script-usrbincat-as-trivial-reducer">Hadoop Streaming II : Python single script &amp; /usr/bin/cat as trivial reducer</h3>
-<p>Streaming single python map reading all files and calculating the max temp for each year</p>
-<pre><code>$time ./run-MaxTemperature-py-single
+<p>Streaming single python map reading all files and calculating the max temp for each year The python map:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#!/usr/bin/env python</span>
+
+<span class="im">import</span> re
+<span class="im">import</span> sys
+
+<span class="cf">for</span> line <span class="op">in</span> sys.stdin:
+        val <span class="op">=</span> line.strip()
+        element <span class="op">=</span> val[<span class="dv">17</span>:<span class="dv">21</span>]
+        <span class="co">#print &quot;element:&gt;%s&lt;&quot; % element</span>
+        <span class="bu">max</span> <span class="op">=</span> {}
+        <span class="cf">if</span>( element <span class="op">==</span> <span class="st">&quot;TMAX&quot;</span>):
+                (year, temp, q) <span class="op">=</span> (val[<span class="dv">11</span>:<span class="dv">15</span>],val[<span class="dv">21</span>:<span class="dv">26</span>],val[<span class="dv">27</span>:<span class="dv">28</span>])
+                <span class="cf">if</span> temp <span class="op">!=</span> <span class="st">&quot;-9999&quot;</span> <span class="op">and</span>  q <span class="op">==</span> <span class="st">&quot; &quot;</span>:
+                        <span class="co">#print &quot;%s\t%s&quot; % (year,temp)</span>
+                        <span class="cf">if</span> <span class="op">not</span> <span class="bu">max</span>.has_key(year) <span class="op">or</span> temp<span class="op">&gt;</span><span class="bu">max</span>[year]:
+                                <span class="bu">max</span>[year] <span class="op">=</span> temp
+        <span class="cf">for</span> yr <span class="op">in</span> <span class="bu">max</span>.keys():
+                <span class="bu">print</span> <span class="st">&quot;</span><span class="sc">%s</span><span class="ch">\t</span><span class="sc">%s</span><span class="st">&quot;</span> <span class="op">%</span> (yr,<span class="bu">max</span>[yr])</code></pre></div>
+<p>The hadoop command &amp; execution</p>
+<pre><code>cat ./run-MaxTemperature-py-single
+#!/bin/bash
+# all/single-file mode: -input input/data/NCDC/ghcnd_hcn \ #/USC00011084.dly \
+OUTDIR=output-py-all-single
+[ -d $OUTDIR ] &amp;&amp; rm -Rf $OUTDIR
+hadoop jar $HADOOP_INSTALL/share/hadoop/tools/lib/hadoop-streaming-*.jar \
+        -input input/data/NCDC/ghcnd_hcn \
+        -output $OUTDIR \
+        -mapper classes/max_temperature_single.py \
+        -reducer /bin/cat \
+        &gt;&amp; log-py-all-single
+grep &quot;Reduce output&quot; log-py-all-single
+$time ./run-MaxTemperature-py-single
 
 real    22m22.339s
 user    22m2.756s
@@ -395,5 +466,21 @@ sys 0m39.069s</code></pre>
   File &quot;/Users/msantos/System/HADOOP/hadoop-2.6.2/test/./classes/max_temperature_single.py&quot;, line 15, in &lt;module&gt;
     if temp&gt;max[year]:
 KeyError: &#39;1889&#39;</code></pre>
+<p>Once corrected we get</p>
+<pre><code>msantos@MBP-2[18:55]:~/System/HADOOP/current/test$time ./run-MaxTemperature-py-single
+        Reduce output records=1413236
+
+real    11m57.894s
+user    7m58.080s
+sys 4m52.835s</code></pre>
+<p>However, directly from the command line we get</p>
+<pre><code>msantos@MBP-2[19:25]:~/System/HADOOP/current/test$time cat input/data/NCDC/ghcnd_hcn/US*.dly | classes/max_temperature_single.py &gt;&amp; o-single
+
+real    0m30.382s
+user    0m25.770s
+sys 0m3.815s</code></pre>
 <h2 id="conclusions">Conclusions</h2>
+<p>Basically, the python map/reduce and single step process both under Hadoop take the same time in processing all 1218 station files, namely around 12min.</p>
+<p>If we run the python directly from the command line on all station files it takes, however, way less: ~30s. This is more in sync with the awk script we tried at the beginning.</p>
+<p>Hadoop incurrs in an overhead that doesn't pay off undless we use many processors. We need to confirm this explicitly.</p>
 <h2 id="why-should-i-care">Why Should I Care?</h2>

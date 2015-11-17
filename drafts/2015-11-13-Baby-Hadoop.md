@@ -7,7 +7,14 @@ tags : [intro, beginner, Hadoop, OSX 10.6.8]
 
 # First tests with Hadoop 2.6.5 on my MacBook Pro OSX 10.6.8
 
-## Overview
+## Index
+* Overview
+* Hadoop install & config
+* Examples
+* Hadoop standalone: Java Mapper and Reducer
+*  Conclusions
+* Why Should I Care?
+* Overview
 
 Recording what happened while getting a hadoop version running and testing the first java, python and 
 bash scripts as hadoop standalone and streaming runs.
@@ -401,6 +408,42 @@ $cat ../input/data/NCDC/ghcnd_hcn/USC00011084.dly | ../classes/max_temperature_m
 1944    350
 1945    356
 ```
+Here the mapper and reducer are:
+The mapper
+```python
+#!/usr/bin/env python
+
+import re
+import sys
+
+for line in sys.stdin:
+        val = line.strip()
+        element = val[17:21]
+        #print "element:>%s<" % element
+        if( element == "TMAX"):
+                (year, temp, q) = (val[11:15],val[21:26],val[27:28])
+                if temp != "-9999" and  q == " ":
+                        print "%s\t%s" % (year,temp)
+```
+and reducer
+```python
+#!/usr/bin/env python
+
+
+import sys
+
+(last_key,max_val) = (None, 0)
+
+for line in sys.stdin:
+        (key,val) = line.strip().split("\t")
+        if ( last_key and last_key != key ):
+                print "%s\t%s" % (last_key,max_val)
+                (last_key,max_val) = (key,int(val))
+        else:
+                (last_key,max_val) = (key,max(max_val,int(val)))
+if last_key:
+        print "%s\t%s" % (last_key,max_val)
+```
 now Using hadoop streaming with a pythong script:
 ```
 OUTDIR=output-py hadoop jar $HADOOP_INSTALL/share/hadoop/tools/lib/hadoop-streaming-*.jar \
@@ -450,7 +493,41 @@ sys	4m45.707s
 ```
 ### Hadoop Streaming II : Python single script & /usr/bin/cat as trivial reducer
 Streaming single python map reading all files and calculating the max temp for each year
+The python map:
+```python
+#!/usr/bin/env python
+
+import re
+import sys
+
+for line in sys.stdin:
+        val = line.strip()
+        element = val[17:21]
+        #print "element:>%s<" % element
+        max = {}
+        if( element == "TMAX"):
+                (year, temp, q) = (val[11:15],val[21:26],val[27:28])
+                if temp != "-9999" and  q == " ":
+                        #print "%s\t%s" % (year,temp)
+                        if not max.has_key(year) or temp>max[year]:
+                                max[year] = temp
+        for yr in max.keys():
+                print "%s\t%s" % (yr,max[yr])
 ```
+The hadoop command \& execution
+```
+cat ./run-MaxTemperature-py-single
+#!/bin/bash
+# all/single-file mode: -input input/data/NCDC/ghcnd_hcn \ #/USC00011084.dly \
+OUTDIR=output-py-all-single
+[ -d $OUTDIR ] && rm -Rf $OUTDIR
+hadoop jar $HADOOP_INSTALL/share/hadoop/tools/lib/hadoop-streaming-*.jar \
+        -input input/data/NCDC/ghcnd_hcn \
+        -output $OUTDIR \
+        -mapper classes/max_temperature_single.py \
+        -reducer /bin/cat \
+        >& log-py-all-single
+grep "Reduce output" log-py-all-single
 $time ./run-MaxTemperature-py-single
 
 real	22m22.339s
@@ -465,6 +542,31 @@ Traceback (most recent call last):
     if temp>max[year]:
 KeyError: '1889'
 ```
+Once corrected we get
+```
+msantos@MBP-2[18:55]:~/System/HADOOP/current/test$time ./run-MaxTemperature-py-single
+		Reduce output records=1413236
+
+real	11m57.894s
+user	7m58.080s
+sys	4m52.835s
+```
+However, directly from the command line we get
+```
+msantos@MBP-2[19:25]:~/System/HADOOP/current/test$time cat input/data/NCDC/ghcnd_hcn/US*.dly | classes/max_temperature_single.py >& o-single
+
+real	0m30.382s
+user	0m25.770s
+sys	0m3.815s
+```
 ##  Conclusions
+
+Basically, the python map/reduce and single step process both under Hadoop take the same time in processing all 1218 station files, 
+namely around 12min.
+
+If we run the python directly from the command line on all station files it takes, however, way less: ~30s. 
+This is more in sync with the awk script we tried at the beginning. 
+
+Hadoop incurrs in an overhead that doesn't pay off undless we use many processors. We need to confirm this explicitly.
 
 ## Why Should I Care?
