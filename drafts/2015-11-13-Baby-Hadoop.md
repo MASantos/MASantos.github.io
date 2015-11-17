@@ -14,7 +14,8 @@ tags : [intro, beginner, Hadoop, OSX 10.6.8]
 * Hadoop standalone: Java Mapper and Reducer
 *  Conclusions
 * Why Should I Care?
-* Overview
+
+## Overview
 
 Recording what happened while getting a hadoop version running and testing the first java, python and 
 bash scripts as hadoop standalone and streaming runs.
