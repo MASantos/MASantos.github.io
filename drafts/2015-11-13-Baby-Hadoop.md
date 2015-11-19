@@ -5,7 +5,7 @@ tagline: "First steps with Haddop"
 tags : [intro, beginner, Hadoop, OSX 10.6.8]
 ---
 
-# First tests with Hadoop 2.6.5 on my MacBook Pro OSX 10.6.8
+# First tests with Hadoop 2.6.2 on my MacBook Pro OSX 10.6.8
 
 ## Table of Contents
 * Index
