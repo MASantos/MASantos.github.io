@@ -7,9 +7,15 @@ PUBLISHDIR=posts
 DRAFTSDIR=drafts
 TITLE="new post"
 ########## Code
+usage(){
+cat<<EOU
+Usage: $0 [-h|--help] [-p|--publish post.md ] [-e|--edit|--new title] 
+EOU
+}
 parse(){
 while [ $# -gt 0 ] ; do
 	case $1 in
+		-h|-help|--help) usage ; exit ;;
 		-p|--publish) shift ; PUBLISH=1;;
 		-e|--edit|--new) shift; TITLE="$@"; while [ $# -gt 0 ] ; do shift ;done ;
 			editPost ; exit ;;
