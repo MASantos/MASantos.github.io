@@ -128,5 +128,68 @@ step 3400, training accuracy 0.98
 step 3500, training accuracy 1
 step 3600, training accuracy 0.98
 step 3700, training accuracy 1   (time: 68:12)
+step 3800, training accuracy 0.98
+step 3900, training accuracy 1
+step 4000, training accuracy 0.96
+step 4100, training accuracy 0.98
+step 4200, training accuracy 1
+step 4300, training accuracy 0.94
+step 4400, training accuracy 1
+step 4500, training accuracy 1
+step 4600, training accuracy 1
+step 4700, training accuracy 0.98
+step 4800, training accuracy 1
+step 4900, training accuracy 0.98
+step 5000, training accuracy 0.98
+step 5100, training accuracy 1
+step 5200, training accuracy 1
+step 5300, training accuracy 1
+step 5400, training accuracy 1
+step 5500, training accuracy 1
+step 5600, training accuracy 1
+step 5700, training accuracy 1
+step 5800, training accuracy 1
+step 5900, training accuracy 0.96
+step 6000, training accuracy 1
+step 6100, training accuracy 1
+step 6200, training accuracy 1
+step 6300, training accuracy 1
+...
+...
+step 10000, training accuracy 0.98
+step 10100, training accuracy 1
+step 10200, training accuracy 1
+step 10300, training accuracy 1
+step 10400, training accuracy 1
+step 10500, training accuracy 0.98
+step 10600, training accuracy 1
+step 10700, training accuracy 1
+step 10800, training accuracy 1
+step 10900, training accuracy 1
+step 11000, training accuracy 1
+step 11100, training accuracy 1
+step 11200, training accuracy 1
+step 11300, training accuracy 1
+step 11400, training accuracy 1
+step 11500, training accuracy 1  (time: 217:01)
 </code></pre>
 <p>After 5min the accuracy is 92% and after 6min is back down to 90%. After around 25 it approaches 1 steadily. The training has been set to 20k iterations.</p>
+<p>It took about 217min for 11500 iterations, which is about 1.9min for 100iterations and gives an ETA time of around 160min, with an expected total computation time of ~6hours using 1single core of my MacBook Pro early 2009.</p>
+<p>The memory footprint is not significant as top shows here</p>
+<pre><code>  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 8494 msantos   20   0  742568 573864  33928 S 99.3 28.0 239:50.68 python</code></pre>
+<p>The last steps</p>
+<pre><code>step 18800, training accuracy 0.98
+step 18900, training accuracy 1
+step 19000, training accuracy 1
+step 19100, training accuracy 1
+step 19200, training accuracy 1
+step 19300, training accuracy 1
+step 19400, training accuracy 1
+step 19500, training accuracy 1
+step 19600, training accuracy 1
+step 19700, training accuracy 1
+step 19800, training accuracy 1
+step 19900, training accuracy 1</code></pre>
+<p>Notice the code doesn't print the accuracy of step 20000, i.e., the last step.</p>
+<p>More soon...</p>

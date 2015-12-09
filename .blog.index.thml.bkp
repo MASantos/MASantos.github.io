@@ -71,6 +71,7 @@
 				<p>Archive</p>
 				<h2 id="posts">Posts</h2>
 				<ul class="posts">
+ <li><span>03 Dec 2015</span> &raquo; <a href="posts/2015-12-03-TensorFlow:-Simple-MNIST-example-with-softmax.html">TensorFlow:-Simple-MNIST-example-with-softmax.html</a></li>
  <li><span>02 Dec 2015</span> &raquo; <a href="posts/2015-12-02-TensorFlow:-Installation.html">TensorFlow:-Installation.html</a></li>
  <li><span>13 Nov 2015</span> &raquo; <a href="posts/2015-11-13-Baby-Hadoop.html">Baby-Hadoop.html</a></li>
 				</ul>
