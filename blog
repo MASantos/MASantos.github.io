@@ -10,41 +10,82 @@ TITLE="new post"
 usage(){
 cat<<EOU
 Usage: $0 [-h|--help] [-p|--publish post.md ] [-e|--edit|--new title] 
+
+OPTIONS
+-h, --help			This help
+-e, --edit, --new title		Edits post with title 'title' (including spaces as it was originally defined). If no posts exists with this title it creates it anew. 
+				'title' can also be the filename (html or md versions) of the post. This command creates the markdown draft file with the post contents.
+				If the title is new, it does not render it! Only the markdown file will be created.
+				Title can have white spaces; doesn't need to be surounded by quotation marks. Creates a draft posts title.md with spaces substituted by hyphens.
+-b, --blog post.md		Converts the draft post post.md into a html page within posts folder, ready to be read by your browser. Does not update index.html nor latest.html.
+-p, --publish post.md		Updates the index.html and latest.html to point include post.md and update the link to the latest post.
+  , --latest			Update latest post.
 EOU
 }
 parse(){
+[ $# -eq 0 ] && usage && exit
 while [ $# -gt 0 ] ; do
 	case $1 in
 		-h|-help|--help) usage ; exit ;;
+		-b|--blog) shift;;
 		-p|--publish) shift ; PUBLISH=1;;
-		-e|--edit|--new) shift; TITLE="$@"; while [ $# -gt 0 ] ; do shift ;done ;
+		-e|--edit|--new) shift; TITLE="$@"; TITLE="$(basename "$TITLE"| sed 's@.md$@@g'|sed 's@.html$@@g')"; while [ $# -gt 0 ] ; do shift ;done ;
 			editPost ; exit ;;
+		--latest) shift ; updateLatest ; exit ;;
 		*) IMDFS=( ${IMDFS[@]} "$1" ) ; shift ;;
 	esac
 done
 }
 
 editPost(){
-fn=$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g')
-[ -s $DRAFTSDIR/$fn ] || echo -e "# $TITLE\n\n" > $DRAFTSDIR/$fn
+fn="$TITLE.md" 
+isOLD=1	
+[ -s $DRAFTSDIR/$fn ] || { isOLD=0 ; fn=$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g') ;  echo -e "# $TITLE\n\n" > $DRAFTSDIR/$fn ;}
 vi + $DRAFTSDIR/$fn
-cmsg "editPost: $DRAFTSDIR/$fn"
+[ `cat $DRAFTSDIR/$fn| wc -w` -gt 2 ] || rm $DRAFTSDIR/$fn 		#the basic heading is 2 word long, has 11 characters and extends over 3 lines (2blank). Removing if there was nothing added to it
+if [ -s $DRAFTSDIR/$fn ] ; then 
+	cmsg "editPost: $DRAFTSDIR/$fn"
+else
+	cmsg "editPost: Posting cancelled."
+fi
+[ $isOLD -eq 1 ] && IMDFS=( "$DRAFTSDIR/$fn" ) && PUBLISH=1 && blogIt
 }
 
-blogIt(){
+# blogIt is the main method which is always called when running script
+# Also, it _always_ renders the markdown file into an html file: We want to be able to see locally how things look at any time!
+blogIt(){	# [fn.md] -> IO() [draft/fn.html] {[post/fn.html]} 
 for f in ${IMDFS[@]} ; do
 	OUT=""
 	[ -s $f ] || errmsg "blogIt: file not found $f"
-	render $f
+	render $f	# render: fn.md -> IO() OUTF(=fn.html)
 	[ $PUBLISH -eq 1 ] && publish $OUTF
 done
 }
 
-publish(){
+#Check whether we are editing a new post or one that already exists.
+isNewEdit(){ # OUTF -> int={1,0} 
+	if [ -s $PUBLISHDIR/$(basename $1) ] ; then 
+		return 1
+	else
+		return 0
+	fi
+}
+
+publish(){ # OUTF (=drafts/fn.html) -> IO() index.html latest.html
 [ $# -ne 1 ] && errmsg "publish: Wrong number of arguments $@"
 cmsg "publish: Publishing $1"
 [ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
 mv $1 $PUBLISHDIR
+test "$(basename $1)" == "$(ls -rtc $PUBLISHDIR| tail -1)" && updateLatest #If we have edited the latest post, update latest link.
+isNewEdit $1 && cmsg "publish: updating blog" && updateBlog $1	#update index and latest only if it's a new post, and not just editing an already existing one.
+}
+
+updateBlog(){	#fn.html -> IO() index.html $PUBLISHDIR/latest.html
+updateIndex $1
+updateLatest
+}
+
+updateIndex(){	#fn.html -> IO() index.html
 # insert post into index.html
 fn=`basename $1`
 day=`echo $fn| cut -d "-" -f 3`
@@ -54,17 +95,21 @@ tit=`echo $fn| cut -d "-" -f 4-| sed 's@.md@@g'`
 cmsg "publish: Backing up index.html..."
 cp -a index.html .blog.index.thml.bkp
 if [ -s .blog.index.thml.bkp ] ; then
- cat .blog.index.thml.bkp | sed 's@\(<ul class="posts">\)@\1\n <li><span>'$day' '$month' '$year'</span> \&raquo; <a href="posts/'$fn'">'$tit'</a></li>@g' > index.html
+ cat .blog.index.thml.bkp | sed 's@\(<ul class="posts">\)@\1\n <li><span>'$day' '$month' '$year'</span> \&raquo; <a href="'$(basename $PUBLISHDIR)'/'$fn'">'$tit'</a></li>@g' > index.html
  cmsg "publish: Inserted new post entry $tit in index.html"
 else
  cmsg "publish: WARNING: couldn't generate backup .blog.index.thml.bkp: Failed to insert post entry into index.html"
 fi
 [ $? -eq 0 ] || errmsg "publish: Something went wrong when updating index.html"
-[ -f $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
-ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
 }
 
-render(){
+updateLatest(){		# IO() $PUBLISHDIR/latest.html
+[ -f $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
+#Update latest.html post link
+#ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
+ln $PUBLISHDIR/$(ls -rtc $PUBLISHDIR| tail -1) $PUBLISHDIR/latest.html
+}
+render(){ 	#f.md -> IO() OUTF(=f.html) 
 [ $# -ne 1 ] && errmsg "render : missing input file"
 OUTF=$(echo $1| sed "s@.md@.html@g")
 pandoc -f markdown -t html5 -o $OUTF $1
