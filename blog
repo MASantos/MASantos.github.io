@@ -75,9 +75,9 @@ publish(){ # OUTF (=drafts/fn.html) -> IO() index.html latest.html
 [ $# -ne 1 ] && errmsg "publish: Wrong number of arguments $@"
 cmsg "publish: Publishing $1"
 [ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
-mv $1 $PUBLISHDIR
-test "$(basename $1)" == "$(ls -rtc $PUBLISHDIR| tail -1)" && updateLatest #If we have edited the latest post, update latest link.
-isNewEdit $1 && cmsg "publish: updating blog" && updateBlog $1	#update index and latest only if it's a new post, and not just editing an already existing one.
+isNewEdit $1 && mv $1 $PUBLISHDIR
+test "$(basename $1)" == "$(ls -rtc $PUBLISHDIR| sort| tail -1)" && updateLatest #If we have edited the latest post, update latest link.
+cmsg "publish: updating blog" && updateBlog $1	#update index and latest only if it's a new post, and not just editing an already existing one.
 }
 
 updateBlog(){	#fn.html -> IO() index.html $PUBLISHDIR/latest.html
@@ -107,7 +107,7 @@ updateLatest(){		# IO() $PUBLISHDIR/latest.html
 [ -f $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
 #Update latest.html post link
 #ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
-ln $PUBLISHDIR/$(ls -rtc $PUBLISHDIR| tail -1) $PUBLISHDIR/latest.html
+ln $PUBLISHDIR/$(ls -rtc $PUBLISHDIR| sort| tail -1) $PUBLISHDIR/latest.html
 }
 render(){ 	#f.md -> IO() OUTF(=f.html) 
 [ $# -ne 1 ] && errmsg "render : missing input file"

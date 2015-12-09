@@ -49,4 +49,4 @@ And log file hadoop-msantos-datanode-MBP-2.local.log gives error:
 java.io.IOException: Incorrect configuration: namenode address dfs.namenode.servicerpc-address or dfs.namenode.rpc-address is not configured.
 ```
 
-
+To be continued...
