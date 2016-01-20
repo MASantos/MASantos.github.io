@@ -6,6 +6,9 @@ PROMPT="blog"
 PUBLISHDIR=posts
 DRAFTSDIR=drafts
 TITLE="new post"
+#
+STATCMD="stat -f %z "
+test "`uname`" == "Linux" && STATCMD="stat -c %s "
 ########## Code
 usage(){
 cat<<EOU
@@ -29,7 +32,8 @@ while [ $# -gt 0 ] ; do
 		-h|-help|--help) usage ; exit ;;
 		-b|--blog) shift;;
 		-p|--publish) shift ; PUBLISH=1;;
-		-e|--edit|--new) shift; TITLE="$@"; TITLE="$(basename "$TITLE"| sed 's@.md$@@g'|sed 's@.html$@@g')"; while [ $# -gt 0 ] ; do shift ;done ;
+		-e|--edit|--new) shift; TITLE="$@"; 
+			while [ $# -gt 0 ] ; do shift ;done ;
 			editPost ; exit ;;
 		--latest) shift ; updateLatest ; exit ;;
 		*) IMDFS=( ${IMDFS[@]} "$1" ) ; shift ;;
@@ -38,17 +42,36 @@ done
 }
 
 editPost(){
-fn="$TITLE.md" 
+#In OSX cmd file has a buggy return value (always 0, even if file doesn't exists). Thus we need to check if TITLE refers to an existing file in another way.
+if test "$(echo $TITLE | sed 's@.*.md@1@g' | sed 's@.*.html@1@g')" == "1" ; then 
+	fn="$(basename $(echo $TITLE| sed 's@.html@.md@g') )"
+	TITLE="$(basename "$TITLE"| sed 's@.md$@@g'|sed 's@.html$@@g'| cut -d '-' -f 4-|sed 's@-@ @g')"
+else
+	fn="$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g')"
+fi
 isOLD=1	
-[ -s $DRAFTSDIR/$fn ] || { isOLD=0 ; fn=$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g') ;  echo -e "# $TITLE\n\n" > $DRAFTSDIR/$fn ;}
-vi + $DRAFTSDIR/$fn
-[ `cat $DRAFTSDIR/$fn| wc -w` -gt 2 ] || rm $DRAFTSDIR/$fn 		#the basic heading is 2 word long, has 11 characters and extends over 3 lines (2blank). Removing if there was nothing added to it
-if [ -s $DRAFTSDIR/$fn ] ; then 
+cmsg "editPost: editing '$fn'"
+#[ -s "$DRAFTSDIR/$fn" ] || { isOLD=0 ; fn=$(echo "$(date +"%Y-%m-%d-")$TITLE.md"| sed 's@[[:space:]]@-@g') ;  echo -e "# $TITLE\n\n" > $DRAFTSDIR/$fn ;}
+[ -s "$DRAFTSDIR/$fn" ] || { isOLD=0 ; echo -e "# $TITLE\n$(date)\n\n" > "$DRAFTSDIR/$fn" ;}
+[ -s "$DRAFTSDIR/$fn" ] || errmsg "editPost: ERROR: Couldn't open file $DRAFTSDIR/$fn"
+osz="$(eval $STATCMD $DRAFTSDIR/$fn )"
+echo $osz
+vi + "$DRAFTSDIR/$fn"
+nsz="$(eval $STATCMD $DRAFTSDIR/$fn )"
+if [ `cat "$DRAFTSDIR/$fn"| wc -w` -lt 10 ] && [ `cat "$DRAFTSDIR/$fn"| wc -l` -lt 6 ] ; then
+	cmsg "Would you like to remove this draft $DRAFTSDIR/$fn? [y/N]"
+	read ans; 
+	case $ans in
+		y|yes|Y|Yes|YES)  rm "$DRAFTSDIR/$fn" 		#the basic heading is 2 word long, has 11 characters and extends over 3 lines (2blank). Removing if there was nothing added to it
+	esac
+fi
+if [ $nsz -ne $osz ] ; then 
 	cmsg "editPost: $DRAFTSDIR/$fn"
 else
-	cmsg "editPost: Posting cancelled."
+	cmsg "editPost: Editing cancelled."
 fi
-[ $isOLD -eq 1 ] && IMDFS=( "$DRAFTSDIR/$fn" ) && PUBLISH=1 && blogIt
+#[ $isOLD -eq 1 ] && IMDFS=( "$DRAFTSDIR/$fn" ) && PUBLISH=0 && blogIt
+IMDFS=( "$DRAFTSDIR/$fn" ) && blogIt
 }
 
 # blogIt is the main method which is always called when running script
@@ -56,9 +79,9 @@ fi
 blogIt(){	# [fn.md] -> IO() [draft/fn.html] {[post/fn.html]} 
 for f in ${IMDFS[@]} ; do
 	OUT=""
-	[ -s $f ] || errmsg "blogIt: file not found $f"
-	render $f	# render: fn.md -> IO() OUTF(=fn.html)
-	[ $PUBLISH -eq 1 ] && publish $OUTF
+	[ -s "$f" ] || errmsg "blogIt: file not found $f"
+	render "$f"	# render: fn.md -> IO() OUTF(=fn.html)
+	[ $PUBLISH -eq 1 ] && publish "$OUTF"
 done
 }
 
@@ -75,23 +98,23 @@ publish(){ # OUTF (=drafts/fn.html) -> IO() index.html latest.html
 [ $# -ne 1 ] && errmsg "publish: Wrong number of arguments $@"
 cmsg "publish: Publishing $1"
 [ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
-isNewEdit $1 && mv $1 $PUBLISHDIR
+isNewEdit "$1" && mv "$1" $PUBLISHDIR
 test "$(basename $1)" == "$(ls -rtc $PUBLISHDIR| sort| tail -1)" && updateLatest #If we have edited the latest post, update latest link.
-cmsg "publish: updating blog" && updateBlog $1	#update index and latest only if it's a new post, and not just editing an already existing one.
+cmsg "publish: updating blog" && updateBlog "$1"	#update index and latest only if it's a new post, and not just editing an already existing one.
 }
 
 updateBlog(){	#fn.html -> IO() index.html $PUBLISHDIR/latest.html
-updateIndex $1
+updateIndex "$1"
 updateLatest
 }
 
 updateIndex(){	#fn.html -> IO() index.html
 # insert post into index.html
 fn=`basename $1`
-day=`echo $fn| cut -d "-" -f 3`
-month=$( date -j -f "%m" $(echo $fn| cut -d "-" -f 2) +"%b" )
-year=`echo $fn| cut -d "-" -f 1| sed 's@.*/@@g'`
-tit=`echo $fn| cut -d "-" -f 4-| sed 's@.md@@g'`
+day=`echo "$fn"| cut -d "-" -f 3`
+month=$( date -j -f "%m" $(echo "$fn"| cut -d "-" -f 2) +"%b" )
+year=`echo "$fn"| cut -d "-" -f 1| sed 's@.*/@@g'`
+tit=`echo "$fn"| cut -d "-" -f 4-| sed 's@.md@@g'`
 cmsg "publish: Backing up index.html..."
 cp -a index.html .blog.index.thml.bkp
 if [ -s .blog.index.thml.bkp ] ; then
@@ -112,7 +135,7 @@ ln $PUBLISHDIR/$(ls -rtc $PUBLISHDIR| sort| tail -1) $PUBLISHDIR/latest.html
 render(){ 	#f.md -> IO() OUTF(=f.html) 
 [ $# -ne 1 ] && errmsg "render : missing input file"
 OUTF=$(echo $1| sed "s@.md@.html@g")
-pandoc -f markdown -t html5 -o $OUTF $1
+pandoc -f markdown_github -t html5 -o "$OUTF" "$1"
 [ $? -ne 0 ] && cmsg "render: WARNING: Something went wrong when rendering into html file $1 -> $OUTF"
 cmsg "render: ok... $OUTF"
 }
