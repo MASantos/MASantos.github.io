@@ -118,7 +118,7 @@ tit=`echo "$fn"| cut -d "-" -f 4-| sed 's@.md@@g'`
 cmsg "publish: Backing up index.html..."
 cp -a index.html .blog.index.thml.bkp
 if [ -s .blog.index.thml.bkp ] ; then
- cat .blog.index.thml.bkp | sed 's@\(<ul class="posts">\)@\1\n <li><span>'$day' '$month' '$year'</span> \&raquo; <a href="'$(basename $PUBLISHDIR)'/'$fn'">'$tit'</a></li>@g' > index.html
+ cat .blog.index.thml.bkp | sed 's@\(<ul class="posts">\)@\1\n<li><span>'$day' '$month' '$year'</span> \&raquo; <a href="'$(basename $PUBLISHDIR)'/'$fn'">'$tit'</a></li>@g' > index.html
  cmsg "publish: Inserted new post entry $tit in index.html"
 else
  cmsg "publish: WARNING: couldn't generate backup .blog.index.thml.bkp: Failed to insert post entry into index.html"
@@ -135,8 +135,17 @@ ln $PUBLISHDIR/$(ls -rtc $PUBLISHDIR| sort| tail -1) $PUBLISHDIR/latest.html
 render(){ 	#f.md -> IO() OUTF(=f.html) 
 [ $# -ne 1 ] && errmsg "render : missing input file"
 OUTF=$(echo $1| sed "s@.md@.html@g")
-pandoc -f markdown_github -t html5 -o "$OUTF" "$1"
+echo -e "\
+<!doctype html>
+<head>
+<style>
+pre { background:beige;}</style>
+</head>
+<body>" > "$OUTF"
+#pandoc -f markdown_github -t html5 -o "$OUTF" "$1"
+pandoc -f markdown_github -t html5  "$1" >> "$OUTF"
 [ $? -ne 0 ] && cmsg "render: WARNING: Something went wrong when rendering into html file $1 -> $OUTF"
+echo -e "</body>\n</html>" >> "$OUTF"
 cmsg "render: ok... $OUTF"
 }
 

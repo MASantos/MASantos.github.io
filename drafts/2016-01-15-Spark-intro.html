@@ -1,3 +1,9 @@
+<!doctype html>
+<head>
+<style>
+pre { background:beige;}</style>
+</head>
+<body>
 <h1 id="spark-intro">Spark intro</h1>
 <p>Tue 19 Jan 2016 17:21:58 EST</p>
 <h2 id="overview">Overview</h2>
@@ -60,7 +66,15 @@ Default partitioner is hash-partition.
 <pre><code>In [1]: lines = sc.textFile(&quot;README.md&quot;)
     lines.count()
 Out[1]: 95</code></pre>
-<p>Key points: * sc creates a &quot;Spark Context&quot;. * lines is an RDD. In this case out of a local file (comes with Spark distribution) * lines.count() does that, indeed, but it does by <strong>collecting all data from all nodes in the cluster</strong>! * This is irrelevant in this case, as we are using a single-node setup, but it is important when working on a cluster!</p>
+<p>Key points:</p>
+<ul>
+<li>sc creates a &quot;Spark Context&quot;.</li>
+<li>lines is an RDD. In this case out of a local file (comes with Spark distribution)</li>
+<li>lines.count() does that, indeed, but it does by <strong>collecting all data from all nodes in the cluster</strong>!
+<ul>
+<li>This is irrelevant in this case, as we are using a single-node setup, but it is important when working on a cluster!</li>
+</ul></li>
+</ul>
 <p>Note: If you are using Firefox with RequestPolicy addon, it will make life easier if you just allow (even if only temporarilly) all out and inbound connections from the notebook server address ( 192.168.56.102 in this case). Otherwise, neither shift+enter nor ctrl+enter will work in order to execute the commands entered.</p>
 <h3 id="examining-types"><a href="#overview">Examining types</a></h3>
 <pre><code>In [3]: sc 
@@ -98,7 +112,8 @@ Out[13]:
  u&#39;[&quot;Specifying the Hadoop Version&quot;](http://spark.apache.org/docs/latest/building-spark.html#specifying-the-hadoop-version)&#39;,
  u&#39;Please refer to the [Configuration Guide](http://spark.apache.org/docs/latest/configuration.html)&#39;]</code></pre>
 <h3 id="map-takeflatmap-reducebykey"><a href="#overview">map(), take(),flatMap(), reduceByKey()</a></h3>
-<p>Let's get a distribution of line lengths. First we will cull the length of a few lines. We will use a list of pairs build as follows:</p>
+<p>Let's get a distribution of line lengths.<br />
+First we will cull the length of a few lines. We will use a list of pairs build as follows:</p>
 <pre><code>In [29]: lengthDist=sparkLines.map(lambda line: (len(line),line)) 
 In [31]: lengthDist.take(3) 
 Out[31]: 
@@ -121,7 +136,8 @@ In [24]: %matplotlib inline
     plt.xlabel(&quot;len&quot;)
     plt.ylabel(&quot;freq&quot;)
 Out[24]: [&lt;matplotlib.lines.Line2D at 0x7f4b507d2390&gt;]</code></pre>
-<p>The plot we obtain is <img src="../images/linesDist.png" alt="Line length distribution in README.md" /></p>
+<p>The plot we obtain is<br />
+<img src="../images/linesDist.png" alt="Line length distribution in README.md" /></p>
 <h3 id="word-count"><a href="#overview">Word Count</a></h3>
 <p>Let's count the word distribution in README.md</p>
 <pre><code>In [26]: wordDist=lines.flatMap(lambda line: line.split()).map(lambda word: (word,1)).reduceByKey(lambda a,b:a+b) 
@@ -141,7 +157,8 @@ In [46]: plt.plot([b for (a,b) in wordDist],&#39;r&#39;)
     plt.xlabel(&quot;Distinct word (index)&quot;)
     plt.ylabel(&quot;Freq&quot;)
 Out[46]: &lt;matplotlib.text.Text at 0x7f4b502cdd50&gt;</code></pre>
-<p>which yields this plot <img src="../images/wordCount.png" alt="Word count distribution in README.md" /></p>
+<p>which yields this plot<br />
+<img src="../images/wordCount.png" alt="Word count distribution in README.md" /></p>
 <p>X-axis corresponds to a different index for each distinct word sort from most frequent to least.</p>
 <h2 id="spark-console-log"><a href="#overview">Spark Console Log</a></h2>
 <h3 id="section-current-installation"><a href="#overview">Section: Current Installation</a></h3>
@@ -227,3 +244,5 @@ Out[46]: &lt;matplotlib.text.Text at 0x7f4b502cdd50&gt;</code></pre>
 16/01/19 15:14:52 INFO DAGScheduler: Job 1 finished: runJob at PythonRDD.scala:393, took 0.255668 s
 16/01/19 15:14:52 INFO TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 155 ms on localhost (1/1)
 16/01/19 15:14:52 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool</code></pre>
+</body>
+</html>
