@@ -139,8 +139,9 @@ echo -e "\
 <!doctype html>
 <head>
 <style>
-pre { background:beige;}</style>
-</head>
+pre { background:beige;width:80%;margin:3em;padding:1em}
+code {color:maroon;}
+</style></head>
 <body>" > "$OUTF"
 #pandoc -f markdown_github -t html5 -o "$OUTF" "$1"
 pandoc -f markdown_github -t html5  "$1" >> "$OUTF"
