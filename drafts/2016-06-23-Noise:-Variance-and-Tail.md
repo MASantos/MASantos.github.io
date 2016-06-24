@@ -23,8 +23,7 @@ Long story short, not being convinced I was using the right priors, I decided I 
 I decided to compare the t-student R-functions (dt(...), rt(...)) to those for a gaussian.  As stated in [Wikipedia](https://en.wikipedia.org/wiki/Student%27s_t-distribution), a t-student probability density has a longer tail than a (*corresponding*) gaussian distribution. Here, *corresponding* means same mean and variance. These two values uniquely specify a gaussian distribution as the latter is characterized by having all cummulants higher than 2nd order identically zero.  How this may lead to a larger tail for a t-student is something I'll leave for a subsequent update of this post.
 
 ## [Comparing variances](#overview)
-Which of the following probability distributions have a larger *variability*? Try to come up with a quick, but reasonable answer
-before reading further.
+Which of the following probability distributions have a larger *variability*? Try to come up with a quick, but reasonable answer before reading further.
 
 ![Which probability density function shows a larger variability?](../images/tstudentVSgaussian/tvsg-df3-df-nolab.jpeg)
 
