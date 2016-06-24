@@ -2,8 +2,11 @@
 Thu 23 Jun 2016 13:56:14 EDT
 
 ## Overview
-I want to quickly write down a reminder than often gets forgotten. At least, it happened now while I was trying to get 
-the right priors for a bayesian analysis of two groups in **R**.
+I want to quickly write down a reminder than often gets forgotten. At least, it happened to me while I was trying to get 
+the right priors for a bayesian analysis of two groups in *R*. In short, I want to comment on
+
+Which of the following probability distributions have a larger *variability*? 
+![Which probability density function shows a larger variability?](../images/tstudentVSgaussian/tvsg-df3-df-nolab.jpeg)
 
 Index:
 * [Overview](#overview)
