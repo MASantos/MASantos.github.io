@@ -71,7 +71,7 @@ Thus, for an apparently already large value of df=100, the algorithms in R show 
 <img src="../images/tstudentVSgaussian/tvsg-df100-sample10k-stilloutliers-1.jpeg" alt="" /><br />
 <img src="../images/tstudentVSgaussian/tvsg-df1k-sample10k-stilloutliers-1.jpeg" alt="" /><br />
 <img src="../images/tstudentVSgaussian/tvsg-df1k-sample10k-stilloutliers-2.jpeg" alt="" /></p>
-<p>For df=100 the probability of having an outlier larger than 4 times the standard deviation is 2 times higher for the t-student as compared to the gaussian case. In R, issue <code>pt(-4,df=100)/pnorm(-4)</code>.</p>
+<p>For df=100 the probability of having an outlier larger than 4 times the standard deviation is 2 times higher for the t-student as compared to the gaussian case (in R, issue <code>pt(-4,df=100)/pnorm(-4)</code>). For df=1000, both probabilities are basically equal (1.07). This ratio, as a function of deviation x from the mean, f(x), grows as a double exponential: the extreme value distribution.</p>
 <h2 id="conclusions"><a href="#overview">Conclusions</a></h2>
 <p>The tail of a prob. density function $f(x)$ controls the frequency of very large outliers. Mathematically it is determined by the limit behavior (e.g., for the right tail) $\lim_{x\to\infty}f(x)$. A closer look at those density plots shows that for $|x|&gt;5$ the probability for outliers is higher for the t-student case than for the coresponding gaussian distribution. A log scale for the y-axis helps in visualizing this.</p>
 <p><img src="../images/tstudentVSgaussian/tvsg-df3-df-tails.jpeg" alt="Tails for t-student (df=3) and corresponding gaussian distributions" /></p>

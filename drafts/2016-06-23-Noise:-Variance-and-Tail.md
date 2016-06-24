@@ -90,7 +90,7 @@ This is how some samplings look like (whatch for those systematic large outliers
 ![](../images/tstudentVSgaussian/tvsg-df1k-sample10k-stilloutliers-1.jpeg)
 ![](../images/tstudentVSgaussian/tvsg-df1k-sample10k-stilloutliers-2.jpeg)
 
-For df=100 the probability of having an outlier larger than 4 times the standard deviation is 2 times higher for the t-student as compared to the gaussian case. In R, issue ```pt(-4,df=100)/pnorm(-4)```.
+For df=100 the probability of having an outlier larger than 4 times the standard deviation is 2 times higher for the t-student as compared to the gaussian case (in R, issue ```pt(-4,df=100)/pnorm(-4)```). For df=1000, both probabilities are basically equal (1.07). This ratio, as a function of deviation x from the mean, f(x), grows as a double exponential: the extreme value distribution. 
  
 ## [Conclusions](#overview)
 The tail of a prob. density function $f(x)$ controls the frequency of very large outliers. Mathematically it is determined  by the limit behavior (e.g., for the right tail) $\lim_{x\to\infty}f(x)$. A closer look at those density plots shows that for $|x|>5$ the probability for outliers is higher for the t-student case than for the coresponding gaussian distribution. A log scale for the y-axis helps in visualizing this.
