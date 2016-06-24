@@ -8,7 +8,8 @@ DRAFTSDIR=drafts
 TITLE="new post"
 #
 STATCMD="stat -f %z "
-test "`uname`" == "Linux" && STATCMD="stat -c %s "
+test "`uname`" == "Linux" && STATCMD="stat -c %s " #same but for linux
+STATMINSZ=300 #in case we remove content from an already published post, the updated post must be at least 301 bytes in size. Less prob. means we don't really want to do it.
 ########## Code
 usage(){
 cat<<EOU
@@ -55,7 +56,7 @@ cmsg "editPost: editing '$fn'"
 [ -s "$DRAFTSDIR/$fn" ] || { isOLD=0 ; echo -e "# $TITLE\n$(date)\n\n" > "$DRAFTSDIR/$fn" ;}
 [ -s "$DRAFTSDIR/$fn" ] || errmsg "editPost: ERROR: Couldn't open file $DRAFTSDIR/$fn"
 osz="$(eval $STATCMD $DRAFTSDIR/$fn )"
-echo $osz
+cmsg "editPost: bytes ($STATCMD) : $osz"
 vi + "$DRAFTSDIR/$fn"
 nsz="$(eval $STATCMD $DRAFTSDIR/$fn )"
 if [ `cat "$DRAFTSDIR/$fn"| wc -w` -lt 10 ] && [ `cat "$DRAFTSDIR/$fn"| wc -l` -lt 6 ] ; then
@@ -68,7 +69,7 @@ fi
 if [ $nsz -ne $osz ] ; then 
 	cmsg "editPost: $DRAFTSDIR/$fn"
 else
-	cmsg "editPost: Editing cancelled."
+	cmsg "editPost: Editing cancelled." ; exit
 fi
 #[ $isOLD -eq 1 ] && IMDFS=( "$DRAFTSDIR/$fn" ) && PUBLISH=0 && blogIt
 IMDFS=( "$DRAFTSDIR/$fn" ) && blogIt
@@ -86,7 +87,7 @@ done
 }
 
 #Check whether we are editing a new post or one that already exists.
-isNewEdit(){ # OUTF -> int={1,0} 
+isNewPost(){ # OUTF -> int={1,0} 
 	if [ -s $PUBLISHDIR/$(basename $1) ] ; then 
 		return 1
 	else
@@ -94,8 +95,24 @@ isNewEdit(){ # OUTF -> int={1,0}
 	fi
 }
 
+isNewEdit(){
+	if [ -s $PUBLISHDIR/$(basename $1) ] ; then 
+		cmsg "...detected previously published post $PUBLISHDIR/$(basename $1)"
+		osz="$(eval $STATCMD $PUBLISHDIR/$(basename $1) )"
+		nsz="$(eval $STATCMD $1 )"
+		if [ $nsz -ne $osz ] && [ $nsz -gt $STATMINSZ ] ; then 
+			cmsg "...detected updated contents from $1."
+			return 0
+		fi
+		cmsg "...no new content added."
+	fi
+	return 1
+
+}
+
 publish(){ # OUTF (=drafts/fn.html) -> IO() index.html latest.html
 [ $# -ne 1 ] && errmsg "publish: Wrong number of arguments $@"
+cmsg "publish: into $PUBLISHDIR"
 cmsg "publish: Publishing $1"
 [ -d $PUBLISHDIR ] || errmsg "publish: Missing posts directory $PUBLISHDIR"
 isNewEdit "$1" && mv "$1" $PUBLISHDIR
@@ -104,7 +121,7 @@ cmsg "publish: updating blog" && updateBlog "$1"	#update index and latest only i
 }
 
 updateBlog(){	#fn.html -> IO() index.html $PUBLISHDIR/latest.html
-updateIndex "$1"
+isNewPost "$1" &&  updateIndex "$1"  #if it's an edit of latet post, we already have in the index
 updateLatest
 }
 

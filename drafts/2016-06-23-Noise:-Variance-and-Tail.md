@@ -93,12 +93,14 @@ This is how some samplings look like (whatch for those systematic large outliers
 ![](../images/tstudentVSgaussian/tvsg-df1k-sample10k-stilloutliers-2.jpeg)
 
 For df=100 the probability of having an outlier larger than 4 times the standard deviation is 2 times higher for the t-student as compared to the gaussian case. In R, issue ```pt(-4,df=100)/pnorm(-4)```.
-
+ 
 ## [Conclusions](#overview)
 The tail of a prob. density function $f(x)$ controls the frequency of very large outliers. Mathematically it is determined  by the limit behavior (e.g., for the right tail) $\lim_{x\to\infty}f(x)$. A closer look at those density plots shows that for $|x|>5$ the probability for outliers is higher for the t-student case than for the coresponding gaussian distribution. A log scale for the y-axis helps in visualizing this.
 
 ![Tails for t-student (df=3) and corresponding gaussian distributions](../images/tstudentVSgaussian/tvsg-df3-df-tails.jpeg)
 
+In summary, the difference in both density plots can be explained as follows: For the guassian distribution the values "constantly" bettween say x=-4 and 4, but "not beyond that range". However, for a t-student distribution, the values mostly stay within a narrower band, but, in comparison, there are *very frequently, large fluctuations* way beyond that range. This compensates that narrower "head" we see to give the same variance for both distributions. 
+ 
 ## [Appendix](#overview)
 You can use the R-script below to check the plots for different values of the variance. This last plot can be obtained by issuing
 ```
@@ -154,3 +156,4 @@ sampleTvsG<-function(n=1000,df=degf,rounding=roundig,showlabel=showlab){
 }
 tvsg()
 ```
+
