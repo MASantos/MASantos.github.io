@@ -99,10 +99,10 @@ The tail of a prob. density function $f(x)$ controls the frequency of very large
 
 In summary, the difference in both density plots can roughly be explained as follows: For the guassian distribution the values *constantly* fluctuate bettween say x=-4 and 4, but *extremely unlikely beyond that range*. However, for a t-student distribution, the values *mostly stay within a narrower band*, but, in comparison, there are *very frequent (as in very likely), large fluctuations* way beyond that range. This compensates that narrower "head" we see to give the same variance for both distributions. 
 
-As a final take-home message, it is only meaningful to compare the *spread* in two density plots when they correspond to the **same probability distribution type**. otherwise the tails need to be taken into account.
- 
+As a final take-home message: it is only meaningful to compare the *spread* in two density plots when they correspond to the **same probability distribution type**; otherwise the tails need to be taken into account.
+     
 ## [Appendix](#overview)
-You can use the R-script below to check the plots for different values of the variance. This last plot can be obtained by issuing
+You can use the R-script below to check the plots for different values of the variance, which is given by the number of degrees of freedom. For instance, this last plot can be obtained by issuing
 ```
 tvsg(3,tails=TRUE)
 ```
