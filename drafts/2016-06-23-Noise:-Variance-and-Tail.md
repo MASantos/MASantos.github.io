@@ -63,8 +63,7 @@ but this a random process, and for such low df values...
 ![but this a random process, and for such low df values...](../images/tstudentVSgaussian/tvsg-df3-sample1k-2.jpeg)
 we can often find huge surprises: 
 ![Three different samplings of N=1000 points for a t-student with $df=3$ and its corresponding guassian distribution](../images/tstudentVSgaussian/tvsg-df3-sample1k-4.jpeg)
-This last sample shows a huge outlier of more than 20 times larger that the standard deviation! To get some perspective of how huge such outlier is
-the probability to get such a large deviation for a gaussian distribution is less 10^-116 !!
+This last sample shows a huge outlier of more than 20 times larger that the standard deviation! To get some perspective of how huge such outlier is the probability to get such a large deviation for a gaussian distribution is less than 10^-116 !! I can't imagine any case (theoretical or not) where this value can't be just equated to 0.
 
 (In R, you may issue ``` pnorm(-23)*2 ``` to get the probability of such an (gaussian) outlier at either end.)
 
