@@ -126,6 +126,7 @@ updateLatest
 }
 
 updateIndex(){	#fn.html -> IO() index.html
+cmsg "publish: updating index..."
 # insert post into index.html
 fn=`basename $1`
 day=`echo "$fn"| cut -d "-" -f 3`
@@ -144,6 +145,7 @@ fi
 }
 
 updateLatest(){		# IO() $PUBLISHDIR/latest.html
+cmsg "publish: updating latest..."
 [ -f $PUBLISHDIR/latest.html ] && rm $PUBLISHDIR/latest.html
 #Update latest.html post link
 #ln $PUBLISHDIR/$fn $PUBLISHDIR/latest.html
